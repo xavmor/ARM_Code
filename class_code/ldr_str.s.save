@@ -1,0 +1,37 @@
+
+.balign 4
+.data
+
+.balign 4
+.bss
+number:
+	.space 4
+number1:
+	.byte 200
+
+
+.balign 4
+.text
+.global _start
+_start:
+	mov r0, #48
+	mov r1, #49
+	mov r2, #50
+	ldr r8, =number
+	strb r0, [r8, #0]
+	strb r1, [r8, #1]
+	strb r2, [r8, #2]
+
+	ldr r8, =number1
+	//ldr r8, [r8]
+	cmp r0, r1
+
+	mov r0, #1
+	mov r1, r8
+	mov r2, #4
+	mov r7, #4
+	svc #0
+
+
+	mov r7, #1
+	svc #0

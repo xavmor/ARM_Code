@@ -1,0 +1,13 @@
+.text
+
+.global main
+main:
+	push {r0, lr}	// We must save the return address given to main, because it will be overwritten soon
+	mov r0, #12	// We are going pass one argument to the function.
+	bl this_function	// Make the function call  (return value will be in r0; return address will be stored in lr)
+	pop {r1, lr}	// Pop to r1, so we don't overwrite the return value, and retrieve the return address for main
+	bx lr		// Return from main, terminating the program (if we skip this, the following add will run, then bx lr, returning from main with the wrong return value)
+
+this_function:
+	add r0, r0, #1	// Add 1 to r0, which is the argument passed in
+	bx lr	// Return from this function

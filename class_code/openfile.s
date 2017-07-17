@@ -1,0 +1,105 @@
+@ System Calls
+.set EXIT, 1
+.set READ, 3
+.set WRITE, 4
+.set OPEN, 5
+.set CLOSE, 6
+
+.set STDOUT, 1
+.set O_RDONLY, 0
+.set O_WRONLY, 1
+.set O_CREAT, 64
+.set O_TRUNC, 512
+.set CREAT_FLAGS, (O_WRONLY | O_CREAT | O_TRUNC)
+
+.data
+filename:
+	.asciz "this_file.txt"
+	.set NAMESIZE, .-filename -1
+newline:
+	.ascii "\n"
+buffer:
+	.skip 20
+
+.text
+.global _start
+_start:
+	// Openfile for write  (create if not present, truncate if present)
+	movw r0, #:lower16:filename
+	movt r0, #:upper16:filename
+
+	movw r1, #CREAT_FLAGS
+
+	movw r2, #0644 // Permission for files
+
+	mov r7, #OPEN
+	svc #0
+
+	mov r4, r0
+
+	//movw r1, #lower16:newline
+	//Write filename to file
+	movw r1, #:lower16:filename
+	movt r1, #:upper16:filename
+
+	mov r2, #NAMESIZE
+
+	mov r7, #WRITE
+	svc #0
+
+	// Write Newline Character to file
+	mov r0, r4
+
+	movw r1, #:lower16:newline
+	movt r1, #:upper16:newline
+
+	mov r2, #1
+
+	mov r7, #WRITE
+	svc #0
+
+	// Close File
+	mov r0, r4
+	mov r7, #CLOSE
+	svc #0
+
+	// OPen for REad
+	movw r0, #:lower16:filename
+	movt r0, #:upper16:filename
+
+	movw r1, #O_RDONLY
+
+	movw r2, #0
+
+	mov r7, #OPEN
+	svc #0
+
+	// Store return value (file handle)
+	mov r4, r0
+
+	// Read
+	movw r1, #:lower16:buffer
+	movt r1, #:upper16:buffer
+	mov r2, #20 @ Buffer Length
+
+	mov r7, #READ
+	svc #0
+
+	mov r5, r0
+
+	// Close File
+	mov r0, r4
+	mov r7, #CLOSE
+	svc #0
+
+	// Write buffer to screen
+	mov r0, #STDOUT
+	movw r1, #:lower16:buffer
+	movt r1, #:upper16:buffer
+	mov r2, r5
+
+	mov r7, #WRITE
+	svc #0
+
+	mov r7, #EXIT
+	svc #0
